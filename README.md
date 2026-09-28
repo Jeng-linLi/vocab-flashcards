@@ -2,7 +2,8 @@
 
 單檔案（零依賴、免安裝）的英文單字閃卡工具：上傳 PDF / PPTX / DOCX 自動擷取生詞，內建約 1.2 萬詞離線詞庫，線上查詞走**境內可直連的權威詞典**。
 
-開啟方式：直接雙擊 `index.html`（`file://` 也能用），或部署到 GitHub Pages 後用網址開啟。
+- 線上直接用：<https://jeng-linli.github.io/vocab-flashcards/>
+- 或下載 `index.html` 雙擊開啟（`file://` 也能用）
 
 ## 功能
 
