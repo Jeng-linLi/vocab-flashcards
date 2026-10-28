@@ -206,6 +206,26 @@ header .badge{
   display:flex; align-items:center; gap:8px;
 }
 
+/* 阅读查词（一键查词） */
+.reader-input{
+  width:100%; min-height:120px; resize:vertical; box-sizing:border-box;
+  border:1.5px solid var(--line); border-radius:14px; outline:none; background:var(--card); color:inherit;
+  padding:14px 16px; font-size:15px; line-height:1.7; font-family:inherit;
+}
+.reader-input:focus{border-color:var(--primary); box-shadow:0 0 0 4px rgba(79,110,247,.14);}
+.reader{
+  margin-top:14px; padding:16px 18px; background:var(--card-soft); border:1px solid var(--line);
+  border-radius:14px; line-height:2.1; font-size:16px; white-space:pre-wrap; word-break:break-word;
+  display:none;
+}
+.reader.show{display:block;}
+.tap-word{
+  cursor:pointer; color:var(--primary); border-bottom:1.5px dotted rgba(79,110,247,.55);
+  border-radius:3px; transition:background .14s var(--ease); padding:0 1px;
+}
+.tap-word:hover{background:rgba(79,110,247,.14);}
+.tap-skip{color:var(--muted);}
+
 /* 闪卡 */
 .study-top{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
 .study-top .info{
@@ -374,6 +394,17 @@ header .badge{
       <p class="notice">联网查词走<b>境内直连的权威词典</b>：中文释义来自<b>百度翻译</b>（JSONP，无需翻墙）；音标、英文释义（WordNet）、同根词、同义词来自<b>有道词典</b>；发音用有道真人发音（英/美）。查询结果可一键加入词库。<b>离线兜底：</b>网络不可用时自动回退内置离线词库（约 1.2 万词，覆盖四六级/考研/托福/GRE 大纲词汇），断网也不影响查词和背诵。</p>
     </div>
 
+    <div class="card-panel">
+      <p class="panel-title">📖 阅读查词（一键查词）</p>
+      <p class="notice">把英文段落贴到下方（或点「载入上次文档」），再点「✨ 一键生成可点查词」。<b>点击段落中任意单词</b>即用上方词典查询；已自动跳过基础词（don't / didn't / is / are…）与缩写（AI / MVP / ASAP…）。</p>
+      <textarea id="readerInput" class="reader-input" placeholder="粘贴英文段落，例如：AI and MVP are popular, but don't overlook the basics of communication."></textarea>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn btn-primary" id="btnBuildReader" style="flex:1;">✨ 一键生成可点查词</button>
+        <button class="btn btn-ghost" id="btnLoadDoc" style="flex-shrink:0;">📄 载入上次文档</button>
+      </div>
+      <div class="reader" id="readerView"></div>
+    </div>
+
     <div class="card-panel" id="extractPanel" style="display:none;">
       <p class="panel-title">🆕 新提取生词 <span class="cnt" id="extractCnt"></span></p>
       <div class="word-list" id="extractList"></div>
@@ -512,6 +543,12 @@ const STOPWORDS = new Set(("a,an,the,and,or,but,if,then,else,when,while,of,to,in
 "hope,hopes,hoped,hoping,wish,wishes,wished,wishing,plan,plans,planned,planning,"+
 "visit,visits,visited,visiting,arrive,arrives,arrived,arriving,leave,leaves,"+
 "travel,travels,traveled,travelling,greet,greets,greeted,greeting,ai,ok,vs,etc,eg,ie").split(","));
+
+/* 缩写式（don't / didn't 等带撇号缩写，以及 cannot；查词与提取时一并跳过） */
+const CONTRACTIONS = new Set(("don't,doesn't,isn't,aren't,wasn't,weren't,haven't,hasn't,hadn't,won't,wouldn't,"+
+"can't,cannot,couldn't,shouldn't,mustn't,shan't,ain't,mightn't,needn't,didn't,"+
+"don’t,doesn’t,isn’t,aren’t,wasn’t,weren’t,haven’t,hasn’t,hadn’t,won’t,wouldn’t,"+
+"can’t,couldn’t,shouldn’t,mustn’t,ain’t,needn’t,didn’t").split(","));
 
 /* ============================================================
  * 内置高中词汇表（约3000词，覆盖高考大纲常见词汇，提取时自动过滤）
@@ -10740,6 +10777,58 @@ $("btnLookup").addEventListener("click", doLookup);
 $("lookupInput").addEventListener("keydown", e => { if (e.key === "Enter") doLookup(); });
 
 /* ============================================================
+ * 阅读查词（一键查词）：把段落切成可点击的单词，点一下即查
+ * 自动跳过：基础高频词（don't / didn't / is / are…）与全大写缩写（AI / MVP / ASAP…）
+ * ============================================================ */
+let lastDocText = ""; // 最近一次解析的文档原文，供「载入上次文档」使用
+
+/* 点击单词即查词：复用在线查词流程 */
+function lookupWord(w){
+  $("lookupInput").value = w;
+  doLookup();
+  const panel = $("lookupResult");
+  if (panel) panel.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+/* 把段落渲染成可点击单词；跳过基础词与缩写 */
+function buildReader(){
+  const raw = $("readerInput").value;
+  const view = $("readerView");
+  if (!raw.trim()){ toast("请先粘贴或载入一段英文"); return; }
+  const re = /([A-Za-z][A-Za-z'-]*)|(\s+)|([\s\S])/g;
+  let html = "", m, count = 0;
+  while ((m = re.exec(raw)) !== null){
+    if (m[1] !== undefined){
+      const tok = m[1];
+      const low = tok.toLowerCase();
+      if (isAbbrev(tok) || isStopword(low)){
+        html += '<span class="tap-skip">' + escapeHtml(tok) + '</span>';
+      } else {
+        html += '<span class="tap-word" data-w="' + escapeHtml(low) + '" title="点击查词">' + escapeHtml(tok) + '</span>';
+        count++;
+      }
+    } else {
+      html += escapeHtml(m[2] !== undefined ? m[2] : m[3]);
+    }
+  }
+  view.innerHTML = html;
+  view.classList.add("show");
+  view.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  toast("✨ 已生成 " + count + " 个可点查词（已跳过基础词与缩写）");
+}
+
+$("btnBuildReader").addEventListener("click", buildReader);
+$("btnLoadDoc").addEventListener("click", () => {
+  if (!lastDocText){ toast("还没有解析过文档，先上传 PDF / PPTX / DOCX 吧"); return; }
+  $("readerInput").value = lastDocText;
+  buildReader();
+});
+$("readerView").addEventListener("click", (e) => {
+  const el = e.target.closest(".tap-word");
+  if (el && el.dataset.w) lookupWord(el.dataset.w);
+});
+
+/* ============================================================
  * 视图切换
  * ============================================================ */
 function switchView(view){ // "manage" | "study" | "blocked"
@@ -10791,6 +10880,7 @@ async function handleFile(file){
     else text = await extractTextFromPptx(file);
     const filterHS = $("chkHS").checked;
     const blockedSet = new Set(getBlocked());
+    lastDocText = text; // 保留原文，供「阅读查词」一键载入
     const result = extractWords(text, filterHS, blockedSet);
     extracted = result.words.map(w => ({ w, m: lookupMeaning(w) }));
     renderExtractList();
@@ -10891,11 +10981,16 @@ function isHighSchoolWord(w){
 
 /* 基础高频词判断（带词形还原：makes→make、said→say、carried→carry 等） */
 function isStopword(w){
-  if (STOPWORDS.has(w)) return true;
+  if (STOPWORDS.has(w) || CONTRACTIONS.has(w)) return true;
   for (const t of hsStems(w)){
-    if (STOPWORDS.has(t)) return true;
+    if (STOPWORDS.has(t) || CONTRACTIONS.has(t)) return true;
   }
   return false;
+}
+
+/* 缩写判断：全大写且 ≥2 个字母（AI / MVP / ASAP / USA…），查词时跳过 */
+function isAbbrev(token){
+  return /^[A-Z]{2,}$/.test(token);
 }
 
 /* 英文单词提取 + 基础高频词（含变形）/ 高中词汇（含变形）/ 屏蔽词库过滤 */
