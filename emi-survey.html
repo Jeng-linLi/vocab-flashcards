@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HKUST(GZ) 全英語學習經驗問卷</title>
+<style>
+  :root{
+    --navy:#0b2a4a;
+    --blue:#1a5fb4;
+    --blue-soft:#e8f0fb;
+    --ink:#1c2530;
+    --muted:#5b6773;
+    --line:#e2e7ee;
+    --bg:#f3f6fa;
+    --card:#ffffff;
+    --ok:#0f8a5f;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"PingFang SC","PingFang TC","Microsoft YaHei","Microsoft JhengHei","Noto Sans SC","Noto Sans TC","Source Han Sans SC","Source Han Sans TC","Hiragino Sans GB",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-synthesis:none;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .progress-track{position:fixed;top:0;left:0;right:0;height:4px;background:transparent;z-index:50;}
+  .progress-bar{height:100%;width:0;background:linear-gradient(90deg,#1a5fb4,#3f8ae0);transition:width .1s linear;}
+  header.hero{
+    background:linear-gradient(135deg,#0b2a4a 0%,#134a80 55%,#1a5fb4 100%);
+    color:#fff;padding:56px 24px 64px;
+  }
+  .hero-inner{max-width:860px;margin:0 auto;}
+  .kicker{font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.75;margin-bottom:12px;}
+  header.hero h1{font-size:30px;margin:0 0 14px;font-weight:700;letter-spacing:.01em;}
+  header.hero p{margin:0;color:#d7e4f5;font-size:15px;max-width:720px;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+  .chip{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);color:#eaf2ff;
+        font-size:12.5px;padding:5px 12px;border-radius:999px;}
+  main{max-width:860px;margin:-34px auto 80px;padding:0 20px;}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 8px 30px rgba(15,42,74,.07);padding:30px 32px;margin-bottom:22px;
+  }
+  .card h2{
+    font-size:19px;margin:0 0 6px;color:var(--navy);display:flex;align-items:center;gap:10px;
+  }
+  .card h2 .tag{
+    font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-soft);
+    padding:3px 9px;border-radius:6px;letter-spacing:.04em;
+  }
+  .card .sub{color:var(--muted);font-size:13.5px;margin:0 0 8px;}
+  .q{padding:18px 0;border-top:1px solid var(--line);}
+  .q:first-of-type{border-top:none;}
+  .q-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;gap:9px;align-items:flex-start;}
+  .num{
+    flex:0 0 auto;font-size:12px;font-weight:700;color:#fff;background:var(--blue);
+    border-radius:6px;padding:1px 8px;margin-top:2px;letter-spacing:.02em;
+  }
+  .opts{display:flex;flex-direction:column;gap:8px;}
+  .opt{
+    display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;
+    padding:10px 14px;cursor:pointer;transition:.15s;background:#fff;font-size:14.5px;
+  }
+  .opt:hover{border-color:#b9cbe4;background:#f8fbff;}
+  .opt input{accent-color:var(--blue);width:17px;height:17px;flex:0 0 auto;}
+  .opt:has(input:checked){border-color:var(--blue);background:var(--blue-soft);}
+  .inline-input{
+    border:none;border-bottom:1.5px solid #b9cbe4;background:transparent;outline:none;
+    font:inherit;font-size:14px;padding:2px 4px;min-width:180px;color:var(--ink);
+  }
+  .inline-input:focus{border-color:var(--blue);}
+  .scale-head{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;
+    margin:4px 0 14px;padding:8px 12px;background:#f6f9fd;border-radius:8px;}
+  .likert{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:460px;}
+  .likert label{
+    text-align:center;border:1px solid var(--line);border-radius:10px;padding:9px 0;
+    cursor:pointer;font-weight:700;color:var(--muted);transition:.15s;background:#fff;font-size:14px;
+  }
+  .likert label:hover{border-color:#b9cbe4;background:#f8fbff;}
+  .likert label:has(input:checked){background:var(--blue);border-color:var(--blue);color:#fff;}
+  .likert input{position:absolute;opacity:0;width:0;height:0;}
+  .section-title{font-size:14px;font-weight:700;color:var(--navy);margin:22px 0 4px;
+    padding-left:10px;border-left:4px solid var(--blue);}
+  select{
+    font:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
+    background:#fff;color:var(--ink);min-width:220px;cursor:pointer;outline:none;
+  }
+  select:focus{border-color:var(--blue);}
+  .row2{display:flex;flex-wrap:wrap;gap:18px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:13px;color:var(--muted);}
+  textarea{
+    width:100%;min-height:90px;font:inherit;font-size:14px;padding:12px 14px;border:1px solid var(--line);
+    border-radius:10px;resize:vertical;outline:none;background:#fff;color:var(--ink);
+  }
+  textarea:focus{border-color:var(--blue);}
+  .hidden{display:none !important;}
+  .actions{display:flex;justify-content:flex-end;gap:12px;margin-top:6px;}
+  .btn{
+    font:inherit;font-size:15px;font-weight:700;border:none;border-radius:10px;padding:13px 30px;
+    cursor:pointer;transition:.15s;
+  }
+  .btn-primary{background:var(--blue);color:#fff;box-shadow:0 6px 18px rgba(26,95,180,.28);}
+  .btn-primary:hover{background:#164e93;}
+  .btn-ghost{background:#eef2f8;color:var(--navy);}
+  .btn-ghost:hover{background:#e2e9f3;}
+  .required-hint{font-size:12.5px;color:var(--muted);margin-top:10px;}
+  .err{color:#c0392b;font-size:13px;margin-top:10px;display:none;}
+  .done{
+    max-width:860px;margin:0 auto 80px;padding:0 20px;
+  }
+  .done-card{
+    background:#fff;border:1px solid var(--line);border-radius:16px;padding:48px 32px;text-align:center;
+    box-shadow:0 8px 30px rgba(15,42,74,.07);
+  }
+  .done-card .tick{
+    width:64px;height:64px;border-radius:50%;background:#e6f6ee;color:var(--ok);
+    display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 18px;
+  }
+  .done-card h2{color:var(--navy);margin:0 0 8px;font-size:22px;}
+  .done-card p{color:var(--muted);margin:0 0 22px;}
+  .lang-toggle{
+    position:fixed;top:14px;right:16px;z-index:80;display:flex;
+    background:rgba(255,255,255,.94);border:1px solid rgba(11,42,74,.16);
+    border-radius:999px;padding:3px;box-shadow:0 4px 16px rgba(15,42,74,.16);
+  }
+  .lang-toggle button{
+    border:none;background:transparent;font:inherit;font-size:13px;font-weight:700;
+    color:#3a4a5c;padding:6px 15px;border-radius:999px;cursor:pointer;transition:.15s;line-height:1;
+  }
+  .lang-toggle button.active{background:var(--blue);color:#fff;}
+  @media(max-width:560px){
+    header.hero{padding:44px 18px 54px;}
+    header.hero h1{font-size:23px;}
+    .card{padding:24px 20px;}
+    .likert{max-width:100%;}
+    select{min-width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<div class="lang-toggle" id="langToggle">
+  <button type="button" data-lang="s" class="active">简</button>
+  <button type="button" data-lang="t">繁</button>
+</div>
+
+<div class="progress-track"><div class="progress-bar" id="bar"></div></div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="kicker">HKUST(GZ) · EMI Learning Experience</div>
+    <h1>全英語學習經驗問卷</h1>
+  </div>
+</header>
+
+<main>
+<form id="survey" novalidate>
+
+  <!-- 第一部分 -->
+  <section class="card">
+    <h2>第一部分：背景資料 <span class="tag">Part 1</span></h2>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q1</span><span>您目前的學歷階段為？<span style="color:var(--muted);font-weight:400;">（單選）</span></span></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q1" value="Year 1 Undergraduate"> Year 1 Undergraduate</label>
+        <label class="opt"><input type="radio" name="q1" value="Year 2 Undergraduate"> Year 2 Undergraduate</label>
+        <label class="opt"><input type="radio" name="q1" value="Year 3 Undergraduate"> Year 3 Undergraduate</label>
+        <label class="opt"><input type="radio" name="q1" value="Year 4 Undergraduate"> Year 4 Undergraduate</label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q2</span><span>請選擇您的生源地與籍貫<span style="color:var(--muted);font-weight:400;">（均為單選）</span></span></div>
+      <div class="row2">
+        <div class="field">
+          <label for="birthplace">(a) 生源地（高中畢業所在地／高考報考省份）</label>
+          <select id="birthplace" name="q2_birthplace"></select>
+        </div>
+        <div class="field">
+          <label for="ancestry">(b) 籍貫（祖籍）</label>
+          <select id="ancestry" name="q2_ancestry"></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q3</span><span>您的母語為？<span style="color:var(--muted);font-weight:400;">（單選）</span></span></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q3" value="普通話"> 普通話</label>
+        <label class="opt"><input type="radio" name="q3" value="粵語"> 粵語</label>
+        <label class="opt"><input type="radio" name="q3" value="其他漢語方言"> 其他漢語方言（請說明）
+          <input class="inline-input" type="text" name="q3_other" placeholder="請填寫"></label>
+        <label class="opt"><input type="radio" name="q3" value="非漢語"> 非漢語（請說明）
+          <input class="inline-input" type="text" name="q3_nonhan" placeholder="請填寫"></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q4</span><span>在進入 HKUST(GZ) 前，您接受全英語授課（EMI）的經驗為？<span style="color:var(--muted);font-weight:400;">（單選）</span></span></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q4" value="從未"> 從未</label>
+        <label class="opt"><input type="radio" name="q4" value="少於 1 年"> 少於 1 年</label>
+        <label class="opt"><input type="radio" name="q4" value="1–3 年"> 1–3 年</label>
+        <label class="opt"><input type="radio" name="q4" value="3–6 年"> 3–6 年</label>
+        <label class="opt"><input type="radio" name="q4" value="6 年以上"> 6 年以上</label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q5</span><span>本研究後續可能邀請部分同學進行短期訪談。您是否願意被聯絡？<span style="color:var(--muted);font-weight:400;">（單選）</span></span></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q5" value="願意" id="q5_yes"> 願意（請留下聯絡郵箱，選填）</label>
+        <div id="emailWrap" class="field hidden" style="margin-left:34px;">
+          <input class="inline-input" type="email" name="q5_email" id="q5_email" placeholder="" style="min-width:200px;">
+          <span style="color:var(--muted);font-size:13px;">@connect.hkust-gz.edu.cn</span>
+        </div>
+        <label class="opt"><input type="radio" name="q5" value="不願意"> 不願意</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第二部分 -->
+  <section class="card">
+    <h2>第二部分：全英語學習經驗 <span class="tag">Part 2</span></h2>
+    <p class="sub">請根據您的實際情況選擇最符合的答案。</p>
+    <div class="scale-head"><span>1 = 非常不同意</span><span>3 = 普通</span><span>5 = 非常同意</span></div>
+    <div id="likertContainer"></div>
+  </section>
+
+  <!-- 協助需求 -->
+  <section class="card">
+    <h2>協助需求與困難來源 <span class="tag">Part 2+</span></h2>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q23</span><span>在<strong>英語課</strong>（如英語寫作／聽說類課程）中，您最需要哪些學習協助？<span style="color:var(--muted);font-weight:400;">（可多選）</span></span></div>
+      <div class="opts">
+        <label class="opt"><input type="checkbox" name="q23" value="學術詞彙與用語補充"> 學術詞彙與用語補充</label>
+        <label class="opt"><input type="checkbox" name="q23" value="聽力與筆記技巧"> 聽力與筆記技巧</label>
+        <label class="opt"><input type="checkbox" name="q23" value="口語表達與課堂發言"> 口語表達與課堂發言</label>
+        <label class="opt"><input type="checkbox" name="q23" value="寫作與作業／報告"> 寫作與作業／報告</label>
+        <label class="opt"><input type="checkbox" name="q23" value="閱讀與文獻理解"> 閱讀與文獻理解</label>
+        <label class="opt"><input type="checkbox" name="q23" value="考試應對策略"> 考試應對策略</label>
+        <label class="opt"><input type="checkbox" name="q23" value="課後輔導／答疑"> 課後輔導／答疑</label>
+        <label class="opt"><input type="checkbox" name="q23" value="其他"> 其他（請說明）
+          <input class="inline-input" type="text" name="q23_other" placeholder="請填寫"></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q24</span><span>在<strong>非英語課</strong>（如工程、數學等專業課）中，您最需要哪些學習協助？<span style="color:var(--muted);font-weight:400;">（可多選）</span></span></div>
+      <div class="opts">
+        <label class="opt"><input type="checkbox" name="q24" value="專業／學科詞彙與術語"> 專業／學科詞彙與術語</label>
+        <label class="opt"><input type="checkbox" name="q24" value="數學／工程符號與公式的英文理解"> 數學／工程符號與公式的英文理解</label>
+        <label class="opt"><input type="checkbox" name="q24" value="課堂聽力與筆記"> 課堂聽力與筆記</label>
+        <label class="opt"><input type="checkbox" name="q24" value="英文教材與作業閱讀"> 英文教材與作業閱讀</label>
+        <label class="opt"><input type="checkbox" name="q24" value="以小組討論完成任務"> 以小組討論完成任務</label>
+        <label class="opt"><input type="checkbox" name="q24" value="中英對照學習資料"> 中英對照學習資料</label>
+        <label class="opt"><input type="checkbox" name="q24" value="課後輔導／答疑"> 課後輔導／答疑</label>
+        <label class="opt"><input type="checkbox" name="q24" value="其他"> 其他（請說明）
+          <input class="inline-input" type="text" name="q24_other" placeholder="請填寫"></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q25</span><span>您認為在<strong>全英語課堂</strong>中遇到理解困難的主要來源是？<span style="color:var(--muted);font-weight:400;">（可多選）</span></span></div>
+      <div class="opts">
+        <label class="opt"><input type="checkbox" name="q25" value="詞彙問題"> 詞彙問題（專業／學科詞彙不足）</label>
+        <label class="opt"><input type="checkbox" name="q25" value="內容問題"> 內容問題（課程知識本身難懂，與語言無關）</label>
+        <label class="opt"><input type="checkbox" name="q25" value="教師語速／發音"> 教師語速／發音導致聽不懂</label>
+        <label class="opt"><input type="checkbox" name="q25" value="語法／句式"> 語法／句式過於複雜</label>
+        <label class="opt"><input type="checkbox" name="q25" value="其他"> 其他（請說明）
+          <input class="inline-input" type="text" name="q25_other" placeholder="請填寫"></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q26</span><span>對於<strong>考試或課外學術活動</strong>，您偏好的參與形式為何？<span style="color:var(--muted);font-weight:400;">（請用「一個詞」回答，選填）</span></span></div>
+      <div class="field" style="max-width:320px;">
+        <input class="inline-input" type="text" name="q26" placeholder="例如：小組／個人／口頭／書面／實作／線上" style="min-width:100%;">
+      </div>
+    </div>
+  </section>
+
+  <!-- 第三部分 -->
+  <section class="card">
+    <h2>第三部分：雙語輔助經驗與態度 <span class="tag">Part 3</span></h2>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q27</span><span>根據您的經驗，是否曾有教授在課堂、Office Hour 或課後交流中使用中文或中英雙語進行解釋？<span style="color:var(--muted);font-weight:400;">（請勿填寫任何課號、課程名稱或教授姓名）（單選）</span></span></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q27" value="從未"> 從未</label>
+        <label class="opt"><input type="radio" name="q27" value="很少"> 很少</label>
+        <label class="opt"><input type="radio" name="q27" value="偶爾"> 偶爾</label>
+        <label class="opt"><input type="radio" name="q27" value="經常"> 經常</label>
+        <label class="opt"><input type="radio" name="q27" value="幾乎總是"> 幾乎總是</label>
+        <label class="opt"><input type="radio" name="q27" value="不適用／未經驗"> 不適用／未經驗</label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q28</span><span>教授適度使用中文或雙語輔助有助於我理解課程內容。</span></div>
+      <div class="likert" data-name="q28">
+        <label><input type="radio" name="q28" value="1">1</label>
+        <label><input type="radio" name="q28" value="2">2</label>
+        <label><input type="radio" name="q28" value="3">3</label>
+        <label><input type="radio" name="q28" value="4">4</label>
+        <label><input type="radio" name="q28" value="5">5</label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q29</span><span>教授在必要時提供中文或雙語解釋能提高我的學習信心。</span></div>
+      <div class="likert" data-name="q29">
+        <label><input type="radio" name="q29" value="1">1</label>
+        <label><input type="radio" name="q29" value="2">2</label>
+        <label><input type="radio" name="q29" value="3">3</label>
+        <label><input type="radio" name="q29" value="4">4</label>
+        <label><input type="radio" name="q29" value="5">5</label>
+      </div>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q30</span><span>教授適度使用中文或雙語輔助會削弱全英語教學的效果。</span></div>
+      <div class="likert" data-name="q30">
+        <label><input type="radio" name="q30" value="1">1</label>
+        <label><input type="radio" name="q30" value="2">2</label>
+        <label><input type="radio" name="q30" value="3">3</label>
+        <label><input type="radio" name="q30" value="4">4</label>
+        <label><input type="radio" name="q30" value="5">5</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第四部分 -->
+  <section class="card">
+    <h2>第四部分：開放式問題 <span class="tag">Part 4</span></h2>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q31</span><span>您認為自己在 HKUST(GZ) 全英語學習環境中面臨的最大挑戰是什麼？</span></div>
+      <textarea name="q31" placeholder="請自由填寫……"></textarea>
+    </div>
+
+    <div class="q">
+      <div class="q-title"><span class="num">Q32</span><span>您認為學校或教師可以提供哪些支持，以幫助學生更好地適應全英語學習環境？</span></div>
+      <textarea name="q32" placeholder="請自由填寫……"></textarea>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button type="button" class="btn btn-ghost" id="resetBtn">清除重填</button>
+    <button type="submit" class="btn btn-primary">提交問卷</button>
+  </div>
+  <div class="required-hint">標示「單選」的題目與量表題為必填；其餘可選填。</div>
+  <div class="err" id="err"></div>
+</form>
+</main>
+
+<div class="done hidden" id="done">
+  <div class="done-card">
+    <div class="tick">✓</div>
+    <h2>已收到您的回覆</h2>
+    <p>感謝您撥冗填寫，您的意見對本研究非常重要。</p>
+    <div class="actions" style="justify-content:center;">
+      <button class="btn btn-ghost" id="downloadBtn">下載我的答案（JSON）</button>
+      <button class="btn btn-primary" id="againBtn">再填一份</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---- 省份選項（含港澳與台灣地區）----
+  var provinces = [
+    "北京市","天津市","上海市","重慶市",
+    "河北省","山西省","遼寧省","吉林省","黑龍江省","江蘇省","浙江省","安徽省","福建省",
+    "江西省","山東省","河南省","湖北省","湖南省","廣東省","海南省","四川省","貴州省",
+    "雲南省","陝西省","甘肅省","青海省",
+    "內蒙古自治區","廣西壯族自治區","西藏自治區","寧夏回族自治區","新疆維吾爾自治區",
+    "香港特別行政區","澳門特別行政區",
+    "台灣地區"
+  ];
+  function fillSelect(el){
+    var html = '<option value="">請選擇</option>';
+    provinces.forEach(function(p){ html += '<option value="'+p+'">'+p+'</option>'; });
+    el.innerHTML = html;
+  }
+  fillSelect(document.getElementById('birthplace'));
+  fillSelect(document.getElementById('ancestry'));
+
+  // ---- 量表題（Q6–Q22）----
+  var sets = [
+    {title:'聽力理解', items:[
+      ['Q6','我能夠理解大部分教授的英文授課內容。'],
+      ['Q7','我經常因為語言問題而錯過課堂中的重要資訊。'],
+      ['Q8','我能夠跟上課堂中的英文討論與問答。']
+    ]},
+    {title:'閱讀理解', items:[
+      ['Q9','閱讀英文教材與學術文獻對我來說具有挑戰性。'],
+      ['Q10','我需要花額外時間將英文學習資料翻譯成中文理解。'],
+      ['Q11','我能有效閱讀並理解英文課程資料。']
+    ]},
+    {title:'課堂參與', items:[
+      ['Q12','我願意主動在課堂上使用英文發言。'],
+      ['Q13','我會因擔心英文表達不夠好而避免提問。'],
+      ['Q14','我傾向於在小組討論中保持沉默，以避免使用英文交流。']
+    ]},
+    {title:'EMI 適應', items:[
+      ['Q15','我會主動尋找資源（如語言中心、同儕討論、線上工具）來克服全英語學習的困難。'],
+      ['Q16','相較於中文授課，我認為全英語授課降低了我的學習效率。'],
+      ['Q17','我認為自己已能適應 HKUST(GZ) 的全英語學習環境。'],
+      ['Q18','即使課程難度增加，我仍能使用英文完成學習任務。']
+    ]},
+    {title:'心理適應', items:[
+      ['Q19','全英語學習環境經常讓我感到焦慮或挫折。'],
+      ['Q20','我曾因全英語學習環境而懷疑自己的學術能力。'],
+      ['Q21','我在全英語學習環境中經常感到較大的學習壓力。'],
+      ['Q22','我能以正面的心態面對全英語學習帶來的挑戰。']
+    ]}
+  ];
+  var container = document.getElementById('likertContainer');
+  var html = '';
+  sets.forEach(function(set){
+    html += '<div class="section-title">'+set.title+'</div>';
+    set.items.forEach(function(it){
+      var name = it[0].toLowerCase();
+      html += '<div class="q">';
+      html += '<div class="q-title"><span class="num">'+it[0]+'</span><span>'+it[1]+'</span></div>';
+      html += '<div class="likert" data-name="'+name+'">';
+      for(var i=1;i<=5;i++){
+        html += '<label><input type="radio" name="'+name+'" value="'+i+'">'+i+'</label>';
+      }
+      html += '</div></div>';
+    });
+  });
+  container.innerHTML = html;
+
+  // ---- Q5 郵箱條件顯示 ----
+  var q5yes = document.getElementById('q5_yes');
+  var emailWrap = document.getElementById('emailWrap');
+  document.querySelectorAll('input[name="q5"]').forEach(function(r){
+    r.addEventListener('change', function(){
+      emailWrap.classList.toggle('hidden', !q5yes.checked);
+    });
+  });
+
+  // ---- 進度條 ----
+  var bar = document.getElementById('bar');
+  window.addEventListener('scroll', function(){
+    var h = document.documentElement;
+    var p = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+    bar.style.width = p + '%';
+  });
+
+  // ---- 提交 ----
+  var form = document.getElementById('survey');
+  var errEl = document.getElementById('err');
+  var lastData = null;
+
+  function collect(){
+    var data = {};
+    var fd = new FormData(form);
+    fd.forEach(function(v,k){
+      if(data[k] === undefined){ data[k] = v; }
+      else if(Array.isArray(data[k])){ data[k].push(v); }
+      else { data[k] = [data[k], v]; }
+    });
+    return data;
+  }
+
+  function validate(){
+    var missing = [];
+    var requiredRadio = ['q1','q3','q4','q5','q27','q28','q29','q30'];
+    // 量表 Q6-Q22
+    for(var n=6;n<=22;n++){ requiredRadio.push('q'+n); }
+    requiredRadio.forEach(function(name){
+      if(!form.querySelector('input[name="'+name+'"]:checked')){ missing.push(name.toUpperCase()); }
+    });
+    if(!document.getElementById('birthplace').value) missing.push('Q2 生源地');
+    if(!document.getElementById('ancestry').value) missing.push('Q2 籍貫');
+    return missing;
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var missing = validate();
+    if(missing.length){
+      errEl.style.display = 'block';
+      errEl.textContent = '請完成以下必填題目：' + missing.join('、');
+      window.scrollTo({top:0,behavior:'smooth'});
+      return;
+    }
+    errEl.style.display = 'none';
+    lastData = collect();
+    lastData._submittedAt = new Date().toISOString();
+    document.getElementById('survey').classList.add('hidden');
+    document.getElementById('done').classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'smooth'});
+    console.log('Survey answers:', lastData);
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    form.reset();
+    emailWrap.classList.add('hidden');
+    errEl.style.display = 'none';
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', function(){
+    var blob = new Blob([JSON.stringify(lastData,null,2)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'EMI_survey_response.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  document.getElementById('againBtn').addEventListener('click', function(){
+    form.reset();
+    emailWrap.classList.add('hidden');
+    errEl.style.display = 'none';
+    document.getElementById('done').classList.add('hidden');
+    document.getElementById('survey').classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+
+  // ---- 繁簡切換（預設簡體）----
+  var T2S = {
+    '問':'问','學':'学','習':'习','經':'经','驗':'验','語':'语','歷':'历','階':'阶','為':'为',
+    '單':'单','選':'选','級':'级','擇':'择','與':'与','貫':'贯','項':'项','轄':'辖','區':'区',
+    '別':'别','灣':'湾','話':'话','粵':'粤','漢':'汉','說':'说','進':'进','從':'从','於':'于',
+    '續':'续','請':'请','訪':'访','談':'谈','願':'愿','聯':'联','絡':'络','郵':'邮','實':'实',
+    '際':'际','況':'况','據':'据','聽':'听','構':'构','閱':'阅','讀':'读','課':'课','參':'参',
+    '適':'适','應':'应','題':'题','夠':'够','內':'内','過':'过','資':'资','訊':'讯','討':'讨',
+    '論':'论','術':'术','獻':'献','對':'对','來':'来','戰':'战','額':'额','時':'时','間':'间',
+    '將':'将','譯':'译','並':'并','動':'动','發':'发','會':'会','擔':'担','達':'达','傾':'倾',
+    '組':'组','尋':'寻','儕':'侪','線':'线','難':'难','較':'较','認':'认','環':'环','務':'务',
+    '讓':'让','慮':'虑','懷':'怀','壓':'压','態':'态','帶':'带','協':'协','寫':'写','類':'类',
+    '彙':'汇','補':'补','記':'记','筆':'笔','業':'业','報':'报','試':'试','輔':'辅','導':'导',
+    '數':'数','專':'专','號':'号','識':'识','關':'关','師':'师','複':'复','雜':'杂','個':'个',
+    '頭':'头','書':'书','雙':'双','釋':'释','稱':'称','爾':'尔','幾':'几','總':'总','開':'开',
+    '臨':'临','麼':'么','幫':'帮','載':'载','謝':'谢','撥':'拨','見':'见','標':'标','餘':'余',
+    '鈕':'钮','覆':'复','兩':'两','處':'处','慶':'庆','廣':'广','壯':'壮','寧':'宁','維':'维',
+    '門':'门','畢':'毕','貴':'贵','頁':'页','體':'体','點':'点','統':'统','變':'变','義':'义',
+    '議':'议','註':'注','無':'无','詞':'词','後':'后','設':'设','東':'东','蘇':'苏',
+    '換':'换','錯':'错','條':'条','陝':'陕','龍':'龙','顯':'显','遼':'辽','雲':'云',
+    '簡':'简','肅':'肃','預':'预'
+  };
+  function toSimp(s){
+    return s.replace(/[\u4e00-\u9fff]/g, function(ch){ return T2S[ch] || ch; });
+  }
+  var textOrig = new Map();
+  var phOrig = new Map();
+  var curLang = 's';
+  function applyLang(){
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(n){
+        var p = n.parentNode && n.parentNode.nodeName;
+        if(p === 'SCRIPT' || p === 'STYLE') return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var n;
+    while((n = walker.nextNode())){
+      if(!textOrig.has(n)) textOrig.set(n, n.nodeValue);
+      var o = textOrig.get(n);
+      n.nodeValue = (curLang === 's') ? toSimp(o) : o;
+    }
+    document.querySelectorAll('[placeholder]').forEach(function(el){
+      if(!phOrig.has(el)) phOrig.set(el, el.getAttribute('placeholder'));
+      var o = phOrig.get(el);
+      el.setAttribute('placeholder', (curLang === 's') ? toSimp(o) : o);
+    });
+  }
+  document.querySelectorAll('#langToggle button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      curLang = btn.getAttribute('data-lang');
+      document.querySelectorAll('#langToggle button').forEach(function(b){
+        b.classList.toggle('active', b === btn);
+      });
+      applyLang();
+    });
+  });
+  applyLang();
+})();
+</script>
+</body>
+</html>
