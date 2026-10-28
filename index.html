@@ -225,6 +225,19 @@ header .badge{
 }
 .tap-word:hover{background:rgba(79,110,247,.14);}
 .tap-skip{color:var(--muted);}
+/* 已会词（已在词库）：淡化 + 小勾，仍可点击复习 */
+.tap-word.tap-known{
+  color:var(--muted); opacity:.72; border-bottom-color:transparent; font-weight:400;
+}
+.tap-word.tap-known:hover{opacity:1; background:var(--soft);}
+.tap-word.tap-known::after{content:"✓"; font-size:.72em; opacity:.7; margin-left:1px; vertical-align:super;}
+.reader-legend{
+  margin-top:10px; font-size:12.5px; color:var(--muted); display:flex; flex-wrap:wrap; gap:14px; align-items:center;
+}
+.reader-legend b{font-weight:600;}
+.reader-legend .lg-new{color:var(--primary);}
+.reader-legend .lg-known{color:var(--muted);}
+.reader-legend .lg-skip{color:var(--muted); opacity:.7;}
 
 /* 闪卡 */
 .study-top{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
@@ -403,6 +416,11 @@ header .badge{
         <button class="btn btn-ghost" id="btnLoadDoc" style="flex-shrink:0;">📄 载入上次文档</button>
       </div>
       <div class="reader" id="readerView"></div>
+      <div class="reader-legend">
+        <span><span class="lg-new">■</span> 新词（可点查）</span>
+        <span><span class="lg-known">■</span> 已在词库（淡化 ✓，仍可点复习）</span>
+        <span><span class="lg-skip">■</span> 已跳过（基础词 / 缩写 / 单位 / 人名）</span>
+      </div>
     </div>
 
     <div class="card-panel" id="extractPanel" style="display:none;">
@@ -10820,7 +10838,10 @@ function buildReader(){
   const view = $("readerView");
   if (!raw.trim()){ toast("请先粘贴或载入一段英文"); return; }
   const re = /([A-Za-z][A-Za-z'-]*)|(\s+)|([\s\S])/g;
-  let html = "", m, count = 0, sentenceStart = true;
+  /* 已会词：词库中的词（含词形还原后的原形） */
+  const bookWords = new Set(getBook().map(x => String(x.w).toLowerCase()));
+  const isKnown = (low) => bookWords.has(low) || hsStems(low).some(t => bookWords.has(t));
+  let html = "", m, count = 0, known = 0, sentenceStart = true;
   while ((m = re.exec(raw)) !== null){
     if (m[1] !== undefined){
       const tok = m[1];
@@ -10830,6 +10851,9 @@ function buildReader(){
       const properNoun = /^[A-Z][a-z]+$/.test(tok) && !sentenceStart;
       if (isAbbrev(tok) || isStopword(low) || isNameToken(tok) || properNoun){
         html += '<span class="tap-skip">' + escapeHtml(tok) + '</span>';
+      } else if (isKnown(low)){
+        html += '<span class="tap-word tap-known" data-w="' + escapeHtml(low) + '" title="已在词库，点击仍可查词">' + escapeHtml(tok) + '</span>';
+        known++;
       } else {
         html += '<span class="tap-word" data-w="' + escapeHtml(low) + '" title="点击查词">' + escapeHtml(tok) + '</span>';
         count++;
@@ -10846,7 +10870,7 @@ function buildReader(){
   view.innerHTML = html;
   view.classList.add("show");
   view.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  toast("✨ 已生成 " + count + " 个可点查词（已跳过基础词、缩写、单位与人名）");
+  toast("✨ 新词 " + count + " 个" + (known ? "，已会词 " + known + " 个（已淡化）" : "") + "（已跳过基础词、缩写、单位与人名）");
 }
 
 $("btnBuildReader").addEventListener("click", buildReader);
